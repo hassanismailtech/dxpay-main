@@ -1,0 +1,31 @@
+# Image manifests for Team 12 apps
+
+apiVersion: manifests/v1beta1
+kind: ImageManifest
+metadata:
+  name: dxpay-frontend
+  namespace: team12
+spec:
+  image: ghcr.io/team12/dxpay-main:build-required
+  allowedRegIDs:
+    - ghcr.io/team12/dxpay-main:build-required
+---
+apiVersion: manifests/v1beta1
+kind: ImageManifest
+metadata:
+  name: dxpay-api
+  namespace: team12
+spec:
+  image: ghcr.io/team12/dxpay-main:build-required
+  allowedRegIDs:
+    - ghcr.io/team12/dxpay-main:build-required
+---
+apiVersion: manifests/v1beta1
+kind: ImageManifest
+metadata:
+  name: dxpay-postgres
+  namespace: team12
+spec:
+  image: postgres:16-alpine
+  allowedRegIDs:
+    - postgres:16-alpine
