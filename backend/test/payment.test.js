@@ -83,9 +83,19 @@ async function verify(payment, reference = 'TXN-test', options = {}) {
 const confirmation = {
   status: 'successful',
   amount: '100.00',
+  amount_paid: '100.00',
   currency: 'NGN',
   reference: 'TXN-test',
 };
+
+test('successful confirmations require an exact, valid amount_paid before database writes', async () => {
+  for (const amount_paid of [undefined, null, 0, -1, '99.99', '100.01', '1e2', '100.001', true, {}, Infinity]) {
+    const result = await verify({ ...confirmation, amount_paid });
+    assert.equal(result.status, 502, `amount_paid=${String(amount_paid)}`);
+    assert.notEqual(result.body.payment_status, 'successful');
+    assert.equal(result.writes, 0);
+  }
+});
 
 test('confirmed payment reports NGN allocation rather than claiming settlement', async () => {
   const result = await verify(confirmation);
@@ -95,6 +105,29 @@ test('confirmed payment reports NGN allocation rather than claiming settlement',
   assert.equal(result.body.allocation_status, 'allocated');
   assert.equal(result.sqlLog.filter((sql) => /INSERT INTO PaymentSplits/.test(sql)).length, 1);
   assert.equal(result.sqlLog.at(-1), 'COMMIT');
+});
+
+test('documented omitted currency still reports NGN and allocates exact payment only', async () => {
+  const payment = { ...confirmation };
+  delete payment.currency;
+  const result = await verify(payment);
+  assert.equal(result.status, 200);
+  assert.equal(result.body.currency, 'NGN');
+  assert.equal(result.body.allocation_status, 'allocated');
+  assert.equal(result.sqlLog.filter((sql) => /INSERT INTO PaymentSplits/.test(sql)).length, 1);
+});
+
+test('non-success states without amount_paid never allocate', async () => {
+  for (const status of ['pending', 'failed', 'partial', 'overpaid', 'reversed']) {
+    const payment = { ...confirmation, status };
+    delete payment.currency;
+    delete payment.amount_paid;
+    const result = await verify(payment);
+    assert.equal(result.status, 200);
+    assert.equal(result.body.payment_status, status);
+    assert.equal(result.body.allocation_status, undefined);
+    assert.equal(result.sqlLog.filter((sql) => /INSERT INTO PaymentSplits/.test(sql)).length, 0);
+  }
 });
 
 test('replayed verification never inserts another provider allocation', async () => {
@@ -153,6 +186,8 @@ test('verification rejects untrusted provider confirmations before allocating', 
     { reference: 'another-invoice' },
     { reference: undefined },
     { currency: 'USD' },
+    { currency: null },
+    { currency: '' },
     { currency: undefined },
     { amount: null },
     { amount: '1e2' },
@@ -160,10 +195,7 @@ test('verification rejects untrusted provider confirmations before allocating', 
     { status: 'unrecognised' },
   ]) {
     const result = await verify({
-      status: 'successful',
-      amount: '100.00',
-      currency: 'NGN',
-      reference: 'TXN-test',
+      ...confirmation,
       ...patch,
     });
     assert.equal(result.status, 502, JSON.stringify(patch));

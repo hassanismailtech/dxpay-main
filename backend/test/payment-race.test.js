@@ -23,7 +23,9 @@ test('delayed success cannot resurrect allocations after a newer reversal', asyn
   const delayed = new Promise((resolve) => {
     releaseOlder = resolve;
   });
-  const confirmation = { reference: 'TXN-race', currency: 'NGN', amount: '100.00' };
+  const confirmation = {
+    reference: 'TXN-race', currency: 'NGN', amount: '100.00', amount_paid: '100.00',
+  };
   process.env.GATEWAY_KEY = 'isolated-test-key';
   pool.query = async () => ({
     rows: [

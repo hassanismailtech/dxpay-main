@@ -11,6 +11,15 @@ app.use('/api/invoices', require('./routes/invoiceRoutes'));
 app.use('/api/payment', require('./routes/paymentRoutes'));
 app.use('/api/dashboard', require('./routes/dashboardRoutes'));
 app.get('/healthz', (req, res) => res.json({ ok: true }));
+app.get('/readyz', async (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  try {
+    await pool.query('SELECT id, name, price, provider_id FROM Tests LIMIT 0');
+    res.json({ ok: true });
+  } catch {
+    res.status(503).json({ ok: false, error: 'Database is not ready.' });
+  }
+});
 app.get('/api/tests', async (req, res) => {
   try {
     const result = await pool.query('SELECT id, name, price, provider_id FROM Tests ORDER BY id');

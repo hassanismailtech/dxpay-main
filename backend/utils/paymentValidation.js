@@ -18,12 +18,23 @@ function validatedPayment(envelope, transaction) {
   if (envelope?.status !== 'success' || !payment || !statuses.includes(payment.status)) {
     throw new Error('Invalid sandbox verification response.');
   }
-  if (payment.reference !== transaction.transaction_reference || payment.currency !== 'NGN') {
+  // This Forge verify endpoint documents NGN amounts but omits currency in its example.
+  // Only omission inherits that contract; an explicitly supplied non-NGN value is invalid.
+  if (
+    payment.reference !== transaction.transaction_reference ||
+    (Object.hasOwn(payment, 'currency') && payment.currency !== 'NGN')
+  ) {
     throw new Error('Sandbox payment identity does not match this invoice.');
   }
   const amount = amountInKobo(payment.amount);
   if (amount === null || amount !== amountInKobo(transaction.amount)) {
     throw new Error('Sandbox payment amount does not match this invoice.');
+  }
+  // A successful status alone cannot authorize value: partial/overpaid collections
+  // may also be described as pending/successful by Forge. Require exact gross paid value,
+  // not the net settlement amount after merchant fees.
+  if (payment.status === 'successful' && amountInKobo(payment.amount_paid) !== amount) {
+    throw new Error('Sandbox paid amount does not match this invoice.');
   }
   return payment;
 }
