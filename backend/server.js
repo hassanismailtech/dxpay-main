@@ -22,7 +22,7 @@ app.get('/api/tests', async (req, res) => {
 
 if (require.main === module) {
   const port = process.env.PORT || 5000;
-  app.listen(port, '127.0.0.1', () => console.log(`Server running on port ${port}`));
+  app.listen(port, '0.0.0.0', () => console.log(`Server running on port ${port}`));
 }
 
 module.exports = app;

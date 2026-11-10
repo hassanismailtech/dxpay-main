@@ -46,7 +46,22 @@ npm start
 
 Diagnostic ordering, reloadable invoices, hosted sandbox checkout, payment verification, and provider allocation views. The technician screen preserves its route but explicitly reports its unavailable backend integration; it does not fabricate paid orders. Authentication and bank settlement are not implemented. Demo and sandbox states remain distinct from live transactions.
 
-Development is local only; production deployment is outside current scope. Use synthetic patient data and preserve attribution and license records.
+Use synthetic patient data and preserve attribution and license records.
+
+## Connect to a hosted backend
+
+The recommended hosted layout is Vercel for this Next.js app and Render for the
+Express API. Add this Vercel environment variable for **Production**:
+
+```dotenv
+BACKEND_URL=https://your-api.onrender.com
+```
+
+The existing Next.js rewrite sends browser requests from `/api/*` to that backend, so
+the browser can keep using relative API paths and does not need a public API variable.
+Redeploy after changing `BACKEND_URL`. Set `NEXT_PUBLIC_API_BASE_URL` only if you
+intentionally want the browser to call the Render URL directly; in that case, set the
+backend's `FRONTEND_URL` to the exact Vercel origin so CORS allows it.
 
 The browser tests use Microsoft Edge by default; install Edge or set `PLAYWRIGHT_CHANNEL=chromium` and run `npx playwright install chromium`. Browser tests use isolated, explicitly synthetic API fixtures and do not charge a bank account. Test runner starts its own server on port 3100.
 

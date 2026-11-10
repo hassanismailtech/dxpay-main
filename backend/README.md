@@ -64,4 +64,40 @@ Run `npm test` for isolated Node regression tests. They use explicit database/ne
 
 Follow [the verification checklist](../docs/verification.md). Process startup alone does not verify database queries, payment safety, fulfillment, or the end-to-end workflow. Use synthetic patient data only.
 
-No hosted service or production deployment is configured by this guide. Preserve existing license and authorship records.
+No hosted service or production deployment is configured automatically; the layout below
+describes the recommended manual setup. Preserve existing license and authorship records.
+
+## Recommended hosted layout
+
+For a prototype, host the frontend on Vercel and this API as a Render Web Service. Use
+Render Postgres (or another managed PostgreSQL provider in the same region) for the
+database. This keeps the long-running Express process and PostgreSQL connection pool
+on a conventional server instead of adapting the payment routes to serverless
+functions.
+
+Create the Render Web Service with:
+
+- **Root directory:** `backend`
+- **Build command:** `npm ci`
+- **Start command:** `npm start`
+- **Health check path:** `/healthz`
+
+Set these Render environment variables:
+
+```dotenv
+FRONTEND_URL=https://your-project.vercel.app
+DATABASE_URL=<Render Postgres internal connection URL>
+PGSSLMODE=require
+BANK_API_URL=<reachable Forge sandbox gateway URL>
+FORGE_MERCHANT_ID=<sandbox merchant id>
+GATEWAY_KEY=<sandbox gateway key>
+```
+
+Render supplies `PORT` automatically. Do not copy `GATEWAY_KEY` or `DATABASE_URL` to
+Vercel or to any `NEXT_PUBLIC_*` variable. The server binds to `0.0.0.0` so Render's
+health check and proxy can reach it.
+
+The Forge default bank URL is cluster-internal and will not be reachable from Render
+unless the Forge team provides a public or private-network route. Confirm that
+connectivity before deploying a real sandbox payment journey; otherwise deploy the API
+inside the permitted Forge environment or use the documented test doubles.

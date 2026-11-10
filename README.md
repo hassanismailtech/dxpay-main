@@ -42,7 +42,7 @@ Run `npm run dev` from `frontend/` and open `http://localhost:3000`. Variables p
 
 ## Status and safeguards
 
-- Local development only. A fresh deployment is a separate, later task; no hosted demo is advertised here.
+- The recommended hosted layout is Vercel for the frontend and Render for the backend; see the [backend hosting guide](backend/README.md#recommended-hosted-layout) and [frontend connection guide](frontend/README.md#connect-to-a-hosted-backend).
 - Checkout and payment verification use the configured Forge sandbox. Missing configuration or mismatched confirmation fails closed.
 - Use synthetic patient data. Do not enter real patient information, bank credentials, or production payment keys.
 - Label demo and sandbox activity explicitly. A checkout callback does not establish confirmed payment or settlement.
