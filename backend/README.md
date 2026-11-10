@@ -64,40 +64,25 @@ Run `npm test` for isolated Node regression tests. They use explicit database/ne
 
 Follow [the verification checklist](../docs/verification.md). Process startup alone does not verify database queries, payment safety, fulfillment, or the end-to-end workflow. Use synthetic patient data only.
 
-No hosted service or production deployment is configured automatically; the layout below
-describes the recommended manual setup. Preserve existing license and authorship records.
+No hosted service or production deployment is configured automatically; the repository is deliberately deployment-agnostic. Container and Kubernetes manifests for the Access Bank Youth Forge Hackathon production environment are provided under `deploy/`.
 
-## Recommended hosted layout
+## Recommended production layout
 
-For a prototype, host the frontend on Vercel and this API as a Render Web Service. Use
-Render Postgres (or another managed PostgreSQL provider in the same region) for the
-database. This keeps the long-running Express process and PostgreSQL connection pool
-on a conventional server instead of adapting the payment routes to serverless
-functions.
+Host the Next.js frontend and Express API as two separate services behind a reverse proxy. Run PostgreSQL in a managed provider or as a sidecar container in the same cluster.
 
-Create the Render Web Service with:
+Container prerequisites:
 
-- **Root directory:** `backend`
-- **Build command:** `npm ci`
-- **Start command:** `npm start`
-- **Health check path:** `/healthz`
+- `backend/Dockerfile`: multi-stage build for the Node 24 slim image; produces a standalone Next.js server and a bundled Express API in one image.
+- `deploy/`: `app.yaml` (cluster deployment manifest), `registry.yaml` (image manifest references), `readiness.yaml`, and `run-local.ps1` (local bootstrap).
 
-Set these Render environment variables:
+Environment variables required at runtime:
 
-```dotenv
-FRONTEND_URL=https://your-project.vercel.app
-DATABASE_URL=<Render Postgres internal connection URL>
-PGSSLMODE=require
-BANK_API_URL=<reachable Forge sandbox gateway URL>
-FORGE_MERCHANT_ID=<sandbox merchant id>
-GATEWAY_KEY=<sandbox gateway key>
-```
+- `PORT` (server)
+- `FRONTEND_URL` (browser origin for redirects)
+- `PGHOST`, `PGPORT`, `PGUSER`, `PGPASSWORD`, `PGDATABASE`, `PGSSLMODE`
+- `DATABASE_URL` (takes precedence over individual PG variables)
+- `BANK_API_URL` (reachable Forge sandbox gateway URL)
+- `FORGE_MERCHANT_ID` (sandbox merchant id)
+- `GATEWAY_KEY` (sandbox gateway key)
 
-Render supplies `PORT` automatically. Do not copy `GATEWAY_KEY` or `DATABASE_URL` to
-Vercel or to any `NEXT_PUBLIC_*` variable. The server binds to `0.0.0.0` so Render's
-health check and proxy can reach it.
-
-The Forge default bank URL is cluster-internal and will not be reachable from Render
-unless the Forge team provides a public or private-network route. Confirm that
-connectivity before deploying a real sandbox payment journey; otherwise deploy the API
-inside the permitted Forge environment or use the documented test doubles.
+If PostgreSQL is remote, set `PGSSLMODE` to `require` and keep certificate validation enabled. The server binds to `127.0.0.1` for local development and to `0.0.0.0` for cluster deployment.

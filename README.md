@@ -8,6 +8,7 @@ DxPay brings diagnostic orders, patient invoices, payment status, provider reven
 
 - `frontend/` — Next.js 16 App Router, React 19, TypeScript, Tailwind CSS 4, Zustand, and Axios.
 - `backend/` — Node.js, Express, and PostgreSQL through `pg`.
+- `deploy/` — packaged container and Kubernetes manifests for the Access Bank Youth Forge Hackathon production environment.
 - `docs/` — local verification and repository handling guidance.
 
 See [frontend setup](frontend/README.md), [backend setup](backend/README.md), and the [verification checklist](docs/verification.md).
@@ -42,7 +43,6 @@ Run `npm run dev` from `frontend/` and open `http://localhost:3000`. Variables p
 
 ## Status and safeguards
 
-- The recommended hosted layout is Vercel for the frontend and Render for the backend; see the [backend hosting guide](backend/README.md#recommended-hosted-layout) and [frontend connection guide](frontend/README.md#connect-to-a-hosted-backend).
 - Checkout and payment verification use the configured Forge sandbox. Missing configuration or mismatched confirmation fails closed.
 - Use synthetic patient data. Do not enter real patient information, bank credentials, or production payment keys.
 - Label demo and sandbox activity explicitly. A checkout callback does not establish confirmed payment or settlement.
