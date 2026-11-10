@@ -1,0 +1,22 @@
+DxPay frontend scope
+Access Bank Youth Forge Hackathon
+
+Local development only. The previous sprint schedule, deployment instructions,
+and assumed API examples have been retired.
+
+Current focus
+- Coherent diagnostic ordering and patient invoice workflows.
+- Clear payment status with explicit demo and sandbox labeling.
+- Provider revenue views and technician fulfillment.
+- Responsive navigation, accessible controls, loading, empty, and error states.
+- Integration against the current backend contract, not historical mock payloads.
+
+Source of truth
+- frontend/README.md: local setup and available commands.
+- frontend/AGENTS.md: architecture and contributor conventions.
+- backend/routes/ and backend/server.js: current API implementation.
+- docs/verification.md: checks to perform and record honestly.
+
+Use synthetic patient data. Never infer payment confirmation from a browser
+callback alone or describe provider allocations as completed bank settlement.
+A fresh hosted deployment is a separate, later task.

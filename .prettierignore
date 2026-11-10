@@ -1,0 +1,7 @@
+node_modules/
+.next/
+package-lock.json
+coverage/
+test-results/
+playwright-report/
+DxPay - africafintechfoundry access-youth-forge/
