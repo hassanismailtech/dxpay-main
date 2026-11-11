@@ -25,10 +25,15 @@ spec:
             - name: http
               containerPort: 3000
           env:
+            - name: PORT
+              value: "3000"
             - name: BACKEND_URL
               value: "http://dxpay-backend:5000"
             - name: NEXT_TELEMETRY_DISABLED
               value: "1"
+          command:
+            - node
+            - /app/frontend/server.js
           readinessProbe:
             httpGet:
               path: /
@@ -86,6 +91,9 @@ spec:
               value: "http://bank-api.ingress-apisix.svc.cluster.local/v1"
             - name: FORGE_MERCHANT_ID
               value: "mer_204"
+          command:
+            - node
+            - /app/backend/server.js
           readinessProbe:
             httpGet:
               path: /readyz

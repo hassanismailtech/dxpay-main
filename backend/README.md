@@ -72,7 +72,7 @@ Host the Next.js frontend and Express API as two separate services behind a reve
 
 Container prerequisites:
 
-- `backend/Dockerfile`: multi-stage build for the Node 24 slim image; produces a standalone Next.js server and a bundled Express API in one image.
+- `Dockerfile`: multi-stage build for the Node 24 slim image; produces a standalone Next.js server and a bundled Express API in one image.
 - `deploy/`: `app.yaml` (cluster deployment manifest), `registry.yaml` (image manifest references), `readiness.yaml`, and `run-local.ps1` (local bootstrap).
 
 Environment variables required at runtime:

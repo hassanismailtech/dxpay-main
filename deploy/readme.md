@@ -1,7 +1,9 @@
 # Production deployment manifests for the Access Bank Youth Forge Hackathon
 
-These manifests deploy the DxPay frontend and API as two containers in the
-`team12` Kubernetes namespace. They are preparation-only: image digests must be
+These manifests deploy the DxPay frontend and API as two containers from the
+same image in the `team12` Kubernetes namespace. The frontend starts the
+standalone Next.js server on port 3000 and the API starts Express on port 5000.
+They are preparation-only: image digests must be
 resolved to verified immutable digests by the build job before `kubectl apply`,
 and secrets must be created outside version control before the first apply.
 

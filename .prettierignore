@@ -5,3 +5,4 @@ coverage/
 test-results/
 playwright-report/
 DxPay - africafintechfoundry access-youth-forge/
+next-env.d.ts
